@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SADAR WOY! - Anti-PMO Brutal Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        blood: {
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            900: '#7f1d1d',
+                        },
+                        void: '#09090b',
+                        surface: '#121215',
+                        border: '#27272a'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #09090b;
+            color: #f4f4f5;
+            overflow-x: hidden;
+        }
+        .brutal-shadow {
+            box-shadow: 4px 4px 0px #dc2626;
+        }
+        .brutal-shadow-sm {
+            box-shadow: 2px 2px 0px #dc2626;
+        }
+        .brutal-shadow-dark {
+            box-shadow: 4px 4px 0px #27272a;
+        }
+        .pulse-danger {
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- Header / Peringatan Keras -->
+    <header class="border-b-2 border-zinc-800 bg-zinc-950/90 sticky top-0 z-30 backdrop-blur-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-3 h-3 bg-red-600 rounded-full animate-ping"></span>
+                <h1 class="font-black text-xl sm:text-2xl tracking-tighter uppercase text-white">
+                    ANTI-PMO <span class="text-red-600">BRUTAL</span>
+                </h1>
+            </div>
+            <button onclick="openSetDateModal()" class="text-xs sm:text-sm font-bold bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 px-3 py-2 rounded-lg transition active:scale-95">
+                ⚙️ Atur Waktu Manual
+            </button>
+        </div>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="max-w-4xl w-full mx-auto px-4 py-6 sm:py-10 space-y-8">
+
+        <!-- Banner Tamparan Pembuka -->
+        <div class="bg-red-950/40 border-2 border-red-600 rounded-xl p-4 sm:p-5 brutal-shadow">
+            <div class="flex items-start gap-3">
+                <span class="text-2xl sm:text-3xl">🤬</span>
+                <div>
+                    <h2 class="font-black text-red-500 uppercase text-sm sm:text-base tracking-wider">Peringatan Keras Buat Otak Lu:</h2>
+                    <p id="quote-display" class="text-zinc-200 font-semibold text-sm sm:text-base mt-1 leading-relaxed">
+                        "Tiap kali lu coli nonton bokep, lu lagi ngelatih otak lu buat jadi penonton pecundang di kehidupan nyata. Bangun woy!"
+                    </p>
+                    <button onclick="generateRandomSlap()" class="mt-3 text-xs font-bold uppercase tracking-wider bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md transition active:scale-95">
+                        🔄 Tampar Gua Lagi (Kata Kasar Acak)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Streak Counter Utama -->
+        <section class="bg-surface border-2 border-zinc-800 rounded-2xl p-6 sm:p-10 text-center relative overflow-hidden">
+            <div class="inline-block bg-zinc-900 border border-zinc-700 px-4 py-1.5 rounded-full mb-4">
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400">Status Lu Sekarang:</span>
+                <span id="rank-badge" class="ml-1 text-xs sm:text-sm font-black uppercase text-red-500">MEMUAT...</span>
+            </div>
+
+            <p class="text-zinc-400 font-bold uppercase tracking-widest text-xs sm:text-sm mb-2">Lu Udah Bertahan Gak Coli Selama:</p>
+            
+            <!-- Angka Hari Besar -->
+            <div class="my-2">
+                <span id="days-count" class="font-mono font-black text-7xl sm:text-9xl text-white tracking-tighter leading-none">0</span>
+                <span class="block sm:inline font-black text-2xl sm:text-4xl text-red-600 uppercase tracking-tight sm:ml-2">HARI</span>
+            </div>
+
+            <!-- Jam, Menit, Detik -->
+            <div class="grid grid-cols-3 gap-2 sm:gap-4 max-w-md mx-auto mt-6 bg-zinc-950 border border-zinc-800 p-4 rounded-xl">
+                <div>
+                    <span id="hours-count" class="font-mono font-extrabold text-2xl sm:text-4xl text-zinc-100 block">00</span>
+                    <span class="text-[10px] sm:text-xs font-bold uppercase text-zinc-500 tracking-wider">Jam</span>
+                </div>
+                <div class="border-x border-zinc-800">
+                    <span id="minutes-count" class="font-mono font-extrabold text-2xl sm:text-4xl text-zinc-100 block">00</span>
+                    <span class="text-[10px] sm:text-xs font-bold uppercase text-zinc-500 tracking-wider">Menit</span>
+                </div>
+                <div>
+                    <span id="seconds-count" class="font-mono font-extrabold text-2xl sm:text-4xl text-red-500 block">00</span>
+                    <span class="text-[10px] sm:text-xs font-bold uppercase text-zinc-500 tracking-wider">Detik</span>
+                </div>
+            </div>
+
+            <p id="rank-description" class="mt-6 text-xs sm:text-sm text-zinc-400 max-w-lg mx-auto italic">
+                "Baru mulai? Jangan bangga dulu, perjalanan lu masih panjang buat bersihin sampah di otak lu."
+            </p>
+        </section>
+
+        <!-- Tombol Aksi Darurat & Reset -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Tombol Panic / Mau Relapse -->
+            <button onclick="openPanicModal()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black text-base sm:text-lg uppercase tracking-wide py-5 px-6 rounded-xl border-2 border-red-400 pulse-danger transition transform active:scale-95 flex flex-col items-center justify-center gap-1 cursor-pointer">
+                <span>🚨 GUA MAU RELAPSE / HORNY!</span>
+                <span class="text-xs font-semibold text-red-100 normal-case">Klik ini sebelum tangan lu berbuat dosa lagi!</span>
+            </button>
+
+            <!-- Tombol Kalah / Reset -->
+            <button onclick="openResetModal()" class="w-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-red-500 font-black text-base sm:text-lg uppercase tracking-wide py-5 px-6 rounded-xl border-2 border-zinc-700 hover:border-red-600 transition transform active:scale-95 flex flex-col items-center justify-center gap-1 cursor-pointer">
+                <span>💀 GUA KALAH / BARU AJA PMO</span>
+                <span class="text-xs font-semibold text-zinc-500 normal-case">Ngaku kalau lu lemah & reset hitungan ke 0</span>
+            </button>
+        </section>
+
+        <!-- Grid: Target Harian & Daftar Dosa -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Target Harian Pengalihan -->
+            <section class="bg-surface border-2 border-zinc-800 rounded-2xl p-5 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-black text-lg uppercase text-white tracking-tight">⚔️ Pengalihan Nafsu Harian</h3>
+                        <p class="text-xs text-zinc-400">Lakuin ini biar otak lu gak mikirin selangkangan terus!</p>
+                    </div>
+                    <button onclick="resetDailyTasks()" class="text-xs text-zinc-500 hover:text-zinc-300 underline">Reset</button>
+                </div>
+
+                <div id="daily-tasks-list" class="space-y-2.5">
+                    <!-- Diisi lewat JS -->
+                </div>
+            </section>
+
+            <!-- Daftar Dosa / Riwayat Kekalahan -->
+            <section class="bg-surface border-2 border-zinc-800 rounded-2xl p-5 sm:p-6 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-black text-lg uppercase text-red-500 tracking-tight">📜 Catatan Kekalahan Lu</h3>
+                        <p class="text-xs text-zinc-400">Bukti sejarah seberapa lemahnya mental lu dulu.</p>
+                    </div>
+                    <span id="relapse-count-badge" class="bg-red-950 text-red-400 border border-red-800 text-xs font-black px-2.5 py-1 rounded-md">0x Kalah</span>
+                </div>
+
+                <div id="relapse-history-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1 flex-1">
+                    <!-- Diisi lewat JS -->
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Tabel Pangkat Brutal -->
+        <section class="bg-surface border-2 border-zinc-800 rounded-2xl p-5 sm:p-6">
+            <h3 class="font-black text-lg uppercase text-white tracking-tight mb-1">🎖️ Tingkatan Harga Diri Lu</h3>
+            <p class="text-xs text-zinc-400 mb-4">Liat posisi lu sekarang. Jangan mati sebagai pecundang di level bawah!</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                <div class="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
+                    <span class="font-black text-red-500 block">HARI 0: BUDAK DOPAMIN MURAHAN</span>
+                    <span class="text-zinc-400">Otak dikontrol nafsu murahan. Gak punya kontrol diri sama sekali.</span>
+                </div>
+                <div class="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
+                    <span class="font-black text-orange-500 block">HARI 1-3: BARU BELAJAR NAHAN NAFSU</span>
+                    <span class="text-zinc-400">Masih sakaw berat. Tangan gatel pengen buka situs haram.</span>
+                </div>
+                <div class="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
+                    <span class="font-black text-yellow-500 block">HARI 4-7: MULAI SADAR DIRI</span>
+                    <span class="text-zinc-400">Kabut otak mulai tipis. Energi mulai balik dikit demi dikit.</span>
+                </div>
+                <div class="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
+                    <span class="font-black text-emerald-500 block">HARI 8-29: OTAK MULAI BERSIH</span>
+                    <span class="text-zinc-400">Mulai berani tatap mata orang. Fokus kerja/belajar meningkat.</span>
+                </div>
+                <div class="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
+                    <span class="font-black text-cyan-400 block">HARI 30-89: BUKAN PECUNDANG LAGI</span>
+                    <span class="text-zinc-400">Lu udah ngalahin 90% cowok lemah di luar sana. Pertahankan!</span>
+                </div>
+                <div class="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
+                    <span class="font-black text-purple-400 block">HARI 90+: MANUSIA SEJATI</span>
+                    <span class="text-zinc-400">Kendali penuh atas diri sendiri. Dopamin normal, mental baja.</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-zinc-900 py-6 text-center text-xs text-zinc-600 px-4">
+        <p>Gak ada yang bisa nyelametin lu kecuali diri lu sendiri. Berhenti nyari alasan, berhenti jadi budak layar!</p>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- MODAL 1: DARURAT / PANIC MODE (MAU RELAPSE) -->
+    <!-- ========================================== -->
+    <div id="panic-modal" class="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="max-w-xl w-full bg-zinc-950 border-4 border-red-600 rounded-2xl p-6 sm:p-8 text-center brutal-shadow my-auto">
+            <div class="inline-block bg-red-600 text-white font-black text-xs uppercase px-3 py-1 rounded-full mb-4 animate-bounce">
+                🚨 INTERVENSI DARURAT 🚨
+            </div>
+            
+            <h2 class="font-black text-2xl sm:text-4xl text-white uppercase tracking-tight leading-tight">
+                SADAR WOY! LU MAU JADI PECUNDANG LAGI?!
+            </h2>
+            
+            <p id="panic-slap-text" class="mt-4 text-red-400 font-bold text-base sm:text-lg leading-relaxed bg-red-950/30 p-4 rounded-xl border border-red-900">
+                "Lu mau tuker harga diri dan masa depan lu cuma buat kesenangan 5 detik di depan layar HP?! Habis crot lu bakal nyesel, lemes, dan benci diri sendiri!"
+            </p>
+
+            <!-- Timer Tahan Diri 60 Detik -->
+            <div class="my-6 bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
+                <p class="text-xs font-bold uppercase text-zinc-400 mb-1">Tahan Diri Lu & Lakuin Perintah Di Bawah Selama:</p>
+                <div id="panic-timer" class="font-mono font-black text-5xl text-red-500">60</div>
+                <p class="text-xs text-zinc-500 mt-1">detik sebelum lu ambil keputusan bodoh</p>
+            </div>
+
+            <!-- Instruksi Fisik Acak -->
+            <div class="bg-amber-950/30 border border-amber-600/50 rounded-xl p-4 mb-6 text-left">
+                <span class="text-xs font-black uppercase text-amber-500 block mb-1">⚡ PERINTAH WAJIB SEKARANG JUGA:</span>
+                <p id="panic-action-text" class="font-bold text-white text-sm sm:text-base">
+                    1. Taruh HP lu sekarang!<br>
+                    2. Push-up 20 kali sampe tangan lu gemeter!<br>
+                    3. Cuci muka pake air dingin atau keluar kamar!
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="closePanicModal()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase py-3.5 px-4 rounded-xl transition active:scale-95 cursor-pointer">
+                    ✅ OKE GUA SADAR, GAK JADI COLI!
+                </button>
+                <button onclick="switchPanicToReset()" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-500 hover:text-red-500 font-bold text-xs uppercase py-3.5 px-4 rounded-xl border border-zinc-800 transition cursor-pointer">
+                    Gua Tetap Lemah & Kalah
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 2: KONFIRMASI RESET / NGAKU KALAH -->
+    <!-- ========================================== -->
+    <div id="reset-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-zinc-950 border-2 border-red-600 rounded-2xl p-6 text-center brutal-shadow">
+            <span class="text-4xl block mb-2">🤡</span>
+            <h2 class="font-black text-2xl text-white uppercase">BENERAN KALAH LU?!</h2>
+            <p class="text-zinc-300 text-sm mt-2 leading-relaxed">
+                Lemah banget mental lu! Janji sama diri sendiri aja dilanggar, gimana mau sukses di hidup nyata?!
+            </p>
+            
+            <div class="mt-4 text-left">
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Alasan Bodoh Lu Relapse Kali Ini:</label>
+                <input type="text" id="relapse-reason" placeholder="Contoh: Gabut di kamar, buka IG/TikTok..." class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-600">
+            </div>
+
+            <div class="mt-6 flex flex-col gap-2">
+                <button onclick="confirmReset()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase py-3 rounded-xl transition active:scale-95 cursor-pointer">
+                    💀 IYA, RESET KE 0 (GUA EMANG LEMAH)
+                </button>
+                <button onclick="closeResetModal()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold uppercase py-2.5 rounded-xl text-xs transition cursor-pointer">
+                    Batal (Gua Belum Relapse)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 3: PENGHAKIMAN SETELAH RESET -->
+    <!-- ========================================== -->
+    <div id="shame-modal" class="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-red-950 border-2 border-red-500 rounded-2xl p-6 text-center">
+            <h2 class="font-black text-2xl text-white uppercase tracking-tight">HITUNGAN DI-RESET KE 0!</h2>
+            <p id="shame-message" class="text-red-200 font-semibold text-sm mt-3 leading-relaxed">
+                Selamat ya, lu baru aja ngebuktiin kalau nafsu lu lebih gede daripada otak lu. Sekarang mulai lagi dari nol, pecundang!
+            </p>
+            <button onclick="closeShameModal()" class="mt-6 w-full bg-white text-black font-black uppercase py-3 rounded-xl hover:bg-zinc-200 transition cursor-pointer">
+                GUA TERIMA HUKUMANNYA, MULAI LAGI!
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 4: ATUR TANGGAL MANUAL -->
+    <!-- ========================================== -->
+    <div id="set-date-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-zinc-950 border-2 border-zinc-700 rounded-2xl p-6">
+            <h2 class="font-black text-xl text-white uppercase">Atur Waktu Terakhir PMO</h2>
+            <p class="text-xs text-zinc-400 mt-1">Jangan bohongin angka di sini. Nipu aplikasi ini sama aja nipu diri lu sendiri!</p>
+            
+            <div class="mt-4">
+                <label class="block text-xs font-bold uppercase text-zinc-400 mb-1">Tanggal & Jam Terakhir Lu Relapse:</label>
+                <input type="datetime-local" id="manual-datetime" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-600">
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button onclick="saveManualDate()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-black uppercase py-2.5 rounded-xl text-sm transition cursor-pointer">
+                    Simpan Waktu
+                </button>
+                <button onclick="closeSetDateModal()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold uppercase py-2.5 px-4 rounded-xl text-sm transition cursor-pointer">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- ========================================== -->
+    <script>
+        // Daftar Tamparan Kata Kasar (Motivasi Brutal)
+        const brutalQuotes = [
+            "Tiap kali lu coli nonton bokep, lu lagi ngelatih otak lu buat jadi penonton pecundang di kehidupan nyata. Bangun woy!",
+            "Otak lu udah penuh sampah piksel! Pantesan lu susah fokus, gampang capek, dan gak punya nyali pas ngomong sama orang!",
+            "Lu kira cewek di layar itu peduli sama lu? Mereka dibayar, sementara lu buang-buang energi vital lu cuma buat tisu basah!",
+            "Berhenti nyalahin keadaan kalau hidup lu gini-gini aja. Kontrol selangkangan sendiri aja lu gak becus, gimana mau kontrol masa depan?!",
+            "Dopamin murahan bikin lu males berjuang. Lu jadi cowok lembek yang maunya instan tanpa usaha!",
+            "Inget rasa jijik, nyesel, dan kosong setelah lu orgasme sendirian di kamar! Lu mau ngerasain sampah itu lagi?!",
+            "Temen-temen lu di luar sana lagi bangun karier, olahraga, dan upgrade diri. Lu malah ngurung diri di kamar nyari video haram. Malu woy!",
+            "Sekali lu ngasih celah buat 'liat bentar doang', otak pecandu lu bakal langsung ngebajak akal sehat lu. Tutup sekarang!",
+            "Energi seksual itu bahan bakar buat ambisi lu. Kalau lu buang tiap hari ke toilet, ya wajar hidup lu gak punya tenaga!",
+            "Gak ada laki-laki hebat yang jadi budak pornografi. Pilih sekarang: mau jadi pria berkelas atau sampah dopamin!"
+        ];
+
+        // Daftar Pesan Darurat saat Panic Mode
+        const panicSlaps = [
+            "Lu mau tuker harga diri dan masa depan lu cuma buat kesenangan 5 detik di depan layar HP?! Habis crot lu bakal nyesel, lemes, dan benci diri sendiri!",
+            "WOY BANGUN! Setan lagi ngetawain betapa gampangnya lu dikendaliin cuma gara-gara rasa gatel sesaat!",
+            "Tutup tab browser lu SEKARANG! Jangan jadi budak nafsu yang gampang banget nyerah cuma karena lagi sendirian di kamar!",
+            "Inget udah berapa hari lu berjuang! Lu mau buang semua keringat dan tahanan lu cuma buat 10 detik kenikmatan semu?!"
+        ];
+
+        // Daftar Perintah Fisik Acak saat Panic Mode
+        const panicActions = [
+            "1. Lempar HP lu ke kasur sekarang!<br>2. Push-up 25 kali sampe dada lu panas!<br>3. Pergi ke kamar mandi, cuci muka pake air dingin!",
+            "1. Berdiri dan keluar dari kamar SEKARANG!<br>2. Minum 2 gelas air putih!<br>3. Lakuin squat jump 20 kali biar darah lu ngalir ke otot, bukan ke otak mesum!",
+            "1. Matiin layar HP/Laptop sekarang juga!<br>2. Jalan keluar rumah/kosan minimal 10 menit, hirup udara luar!<br>3. Jangan balik ke kamar sebelum pikiran lu waras!",
+            "1. Tarik napas dalem 4 detik, tahan 4 detik, buang 4 detik (ulang 5x)!<br>2. Plank selama 60 detik penuh!<br>3. Bikin kopi atau teh, jauhin kasur!"
+        ];
+
+        // Daftar Aktivitas Pengalihan Harian
+        const defaultTasks = [
+            { id: 't1', text: 'Push-up / Olahraga minimal 15 menit biar capek fisik', done: false },
+            { id: 't2', text: 'Mandi air dingin (bunuh rasa sange seketika)', done: false },
+            { id: 't3', text: 'Jauhin HP dari kasur pas mau tidur', done: false },
+            { id: 't4', text: 'Unfollow / Blokir akun pemicu nafsu di sosmed', done: false },
+            { id: 't5', text: 'Keluar kamar / Produktif kerja atau belajar 1 jam penuh', done: false }
+        ];
+
+        // State Aplikasi
+        let startTime = localStorage.getItem('antipmo_start_time');
+        let relapseHistory = JSON.parse(localStorage.getItem('antipmo_history')) || [];
+        let dailyTasks = JSON.parse(localStorage.getItem('antipmo_tasks')) || defaultTasks;
+        let panicInterval = null;
+
+        // Inisialisasi jika pengguna baru pertama kali buka
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem('antipmo_start_time', startTime);
+        } else {
+            startTime = parseInt(startTime, 10);
+        }
+
+        // Update Penghitung Waktu Setiap Detik
+        function updateCounter() {
+            const now = Date.now();
+            let diff = now - startTime;
+            if (diff < 0) diff = 0;
+
+            const seconds = Math.floor((diff / 1000) % 60);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            document.getElementById('days-count').textContent = days;
+            document.getElementById('hours-count').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes-count').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds-count').textContent = String(seconds).padStart(2, '0');
+
+            updateRank(days);
+        }
+
+        // Sistem Pangkat Brutal Berdasarkan Hari
+        function updateRank(days) {
+            const badge = document.getElementById('rank-badge');
+            const desc = document.getElementById('rank-description');
+
+            if (days === 0) {
+                badge.textContent = "BUDAK DOPAMIN MURAHAN";
+                badge.className = "ml-1 text-xs sm:text-sm font-black uppercase text-red-500";
+                desc.textContent = "\"Baru mulai? Jangan bangga dulu, otak lu masih penuh sampah dan gampang banget tumbang.\"";
+            } else if (days >= 1 && days <= 3) {
+                badge.textContent = "BARU BELAJAR NAHAN NAFSU";
+                badge.className = "ml-1 text-xs sm:text-sm font-black uppercase text-orange-500";
+                desc.textContent = "\"Fase sakaw paling berat. Jangan sok kuat buka sosmed yang aneh-aneh kalau gak mau balik ke nol!\"";
+            } else if (days >= 4 && days <= 7) {
+                badge.textContent = "MULAI SADAR DIRI";
+                badge.className = "ml-1 text-xs sm:text-sm font-black uppercase text-yellow-400";
+                desc.textContent = "\"Lumayan, lu udah ngelewatin minggu pertama. Tapi inget, setan paling suka nyerang pas lu mulai ngerasa aman.\"";
+            } else if (days >= 8 && days <= 29) {
+                badge.textContent = "OTAK MULAI BERSIH";
+                badge.className = "ml-1 text-xs sm:text-sm font-black uppercase text-emerald-400";
+                desc.textContent = "\"Energi lu mulai balik, pikiran lebih jernih. Jangan sia-siain progres ini cuma buat video sampah!\"";
+            } else if (days >= 30 && days <= 89) {
+                badge.textContent = "BUKAN PECUNDANG LAGI";
+                badge.className = "ml-1 text-xs sm:text-sm font-black uppercase text-cyan-400";
+                desc.textContent = "\"Sebulan lebih bersih! Lu udah buktiin lu punya kendali atas diri lu sendiri. Terusin sampe 90 hari!\"";
+            } else {
+                badge.textContent = "MANUSIA SEJATI (MENTAL BAJA)";
+                badge.className = "ml-1 text-xs sm:text-sm font-black uppercase text-purple-400";
+                desc.textContent = "\"90+ Hari! Lu udah bebas dari rantai perbudakan dopamin. Jaga kehormatan lu sampe mati!\"";
+            }
+        }
+
+        // Generator Tamparan Kata Kasar Acak
+        function generateRandomSlap() {
+            const quoteEl = document.getElementById('quote-display');
+            let randomQuote = brutalQuotes[Math.floor(Math.random() * brutalQuotes.length)];
+            // Pastikan tidak mengulang kutipan yang sama persis
+            while (quoteEl.textContent.includes(randomQuote) && brutalQuotes.length > 1) {
+                randomQuote = brutalQuotes[Math.floor(Math.random() * brutalQuotes.length)];
+            }
+            quoteEl.textContent = `"${randomQuote}"`;
+        }
+
+        // Render Daftar Target Harian
+        function renderDailyTasks() {
+            const container = document.getElementById('daily-tasks-list');
+            container.innerHTML = '';
+
+            dailyTasks.forEach(task => {
+                const item = document.createElement('label');
+                item.className = `flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition select-none ${
+                    task.done 
+                    ? 'bg-emerald-950/20 border-emerald-800/60 text-zinc-500 line-through' 
+                    : 'bg-zinc-950 border-zinc-800 hover:border-zinc-700 text-zinc-200'
+                }`;
+                
+                item.innerHTML = `
+                    <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask('${task.id}')" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
+                    <span class="text-xs sm:text-sm font-semibold">${task.text}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function toggleTask(id) {
+            dailyTasks = dailyTasks.map(t => t.id === id ? { ...t, done: !t.done } : t);
+            localStorage.setItem('antipmo_tasks', JSON.stringify(dailyTasks));
+            renderDailyTasks();
+        }
+
+        function resetDailyTasks() {
+            dailyTasks = dailyTasks.map(t => ({ ...t, done: false }));
+            localStorage.setItem('antipmo_tasks', JSON.stringify(dailyTasks));
+            renderDailyTasks();
+        }
+
+        // Render Riwayat Kekalahan / Relapse
+        function renderRelapseHistory() {
+            const container = document.getElementById('relapse-history-list');
+            const badge = document.getElementById('relapse-count-badge');
+            badge.textContent = `${relapseHistory.length}x Kalah`;
+
+            if (relapseHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 px-4 border border-dashed border-zinc-800 rounded-xl">
+                        <p class="text-xs text-zinc-500 font-semibold">Belum ada catatan kekalahan di sini. Pertahanin kebersihan catatan ini, jangan sampe tercoreng!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            // Tampilkan dari yang paling baru
+            [...relapseHistory].reverse().forEach(entry => {
+                const div = document.createElement('div');
+                div.className = 'p-3 rounded-xl bg-zinc-950 border border-red-900/40 text-xs';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center text-red-400 font-bold mb-1">
+                        <span>💀 Tumbang di Hari ke-${entry.streakDays}</span>
+                        <span class="text-[10px] text-zinc-500">${entry.date}</span>
+                    </div>
+                    <p class="text-zinc-400 italic">"Alasan: ${entry.reason}"</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // ==========================================
+        // LOGIKA MODAL DARURAT (PANIC MODE)
+        // ==========================================
+        function openPanicModal() {
+            const modal = document.getElementById('panic-modal');
+            const slapText = document.getElementById('panic-slap-text');
+            const actionText = document.getElementById('panic-action-text');
+            const timerEl = document.getElementById('panic-timer');
+
+            slapText.textContent = `"${panicSlaps[Math.floor(Math.random() * panicSlaps.length)]}"`;
+            actionText.innerHTML = panicActions[Math.floor(Math.random() * panicActions.length)];
+
+            let timeLeft = 60;
+            timerEl.textContent = timeLeft;
+            modal.classList.remove('hidden');
+
+            clearInterval(panicInterval);
+            panicInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(panicInterval);
+                    timerEl.textContent = "0";
+                }
+            }, 1000);
+        }
+
+        function closePanicModal() {
+            clearInterval(panicInterval);
+            document.getElementById('panic-modal').classList.add('hidden');
+        }
+
+        function switchPanicToReset() {
+            closePanicModal();
+            openResetModal();
+        }
+
+        // ==========================================
+        // LOGIKA MODAL RESET / NGAKU KALAH
+        // ==========================================
+        function openResetModal() {
+            document.getElementById('relapse-reason').value = '';
+            document.getElementById('reset-modal').classList.remove('hidden');
+        }
+
+        function closeResetModal() {
+            document.getElementById('reset-modal').classList.add('hidden');
+        }
+
+        function confirmReset() {
+            const reasonInput = document.getElementById('relapse-reason').value.trim();
+            const reason = reasonInput || "Gak punya alasan, emang mental tempe aja";
+            
+            // Hitung berapa hari bertahan sebelum kalah
+            const diff = Date.now() - startTime;
+            const streakDays = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+
+            const nowFormatted = new Date().toLocaleDateString('id-ID', {
+                day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            // Simpan ke riwayat kekalahan
+            relapseHistory.push({
+                streakDays: streakDays,
+                date: nowFormatted,
+                reason: reason
+            });
+            localStorage.setItem('antipmo_history', JSON.stringify(relapseHistory));
+
+            // Reset waktu ke sekarang
+            startTime = Date.now();
+            localStorage.setItem('antipmo_start_time', startTime);
+
+            closeResetModal();
+            renderRelapseHistory();
+            updateCounter();
+
+            // Tampilkan pesan penghakiman pedas
+            const shameMessages = [
+                `Lu baru aja buang perjuangan ${streakDays} hari cuma buat kesenangan sampah! Otak lu bakal balik lemot lagi. Bangkit sekarang dan jangan ulangi kebodohan ini!`,
+                `Selamat ya, nafsu selangkangan lu menang lagi atas akal sehat lu! Catatan kekalahan lu udah nambah. Mau sampe kapan jadi pecundang?!`,
+                `Hitungan balik ke 0! Inget rasa nyesel dan lemes yang lu rasain detik ini. Pake rasa sakit ini biar besok lu gak segoblok hari ini!`
+            ];
+            document.getElementById('shame-message').textContent = shameMessages[Math.floor(Math.random() * shameMessages.length)];
+            document.getElementById('shame-modal').classList.remove('hidden');
+        }
+
+        function closeShameModal() {
+            document.getElementById('shame-modal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // LOGIKA ATUR TANGGAL MANUAL
+        // ==========================================
+        function openSetDateModal() {
+            const modal = document.getElementById('set-date-modal');
+            const input = document.getElementById('manual-datetime');
+            
+            // Format startTime ke YYYY-MM-DDTHH:MM untuk input datetime-local
+            const d = new Date(startTime);
+            const tzOffset = d.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(d - tzOffset)).toISOString().slice(0, 16);
+            
+            input.value = localISOTime;
+            modal.classList.remove('hidden');
+        }
+
+        function closeSetDateModal() {
+            document.getElementById('set-date-modal').classList.add('hidden');
+        }
+
+        function saveManualDate() {
+            const inputVal = document.getElementById('manual-datetime').value;
+            if (!inputVal) return;
+
+            const selectedTimestamp = new Date(inputVal).getTime();
+            if (selectedTimestamp > Date.now()) {
+                // Jika user memilih waktu di masa depan, set ke waktu sekarang
+                startTime = Date.now();
+            } else {
+                startTime = selectedTimestamp;
+            }
+
+            localStorage.setItem('antipmo_start_time', startTime);
+            updateCounter();
+            closeSetDateModal();
+        }
+
+        // Jalankan inisialisasi saat halaman dimuat
+        window.onload = function() {
+            renderDailyTasks();
+            renderRelapseHistory();
+            updateCounter();
+            setInterval(updateCounter, 1000);
+        };
+    </script>
+</body>
+</html>
